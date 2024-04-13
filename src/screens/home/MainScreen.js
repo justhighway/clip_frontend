@@ -3,14 +3,13 @@ import {
   Animated,
   PanResponder,
   StyleSheet,
-  Text,
   View,
   Dimensions,
 } from 'react-native'
 import CardSwiper from '../../components/CardSwiper'
 import { items as itemsArray } from '../../libs/data'
 
-const { width, height } = Dimensions.get('screen')
+const { height } = Dimensions.get('screen')
 
 export default function MainScreen() {
   const [items, setItems] = useState(itemsArray)
@@ -24,6 +23,7 @@ export default function MainScreen() {
       swipe.setValue({ x: dx, y: dy })
       tiltSign.setValue(y0 > (height * 0.9) / 2 ? 1 : -1)
     },
+
     onPanResponderRelease: (_, { dx, dy }) => {
       const direction = Math.sign(dx)
       const isActionActive = Math.abs(dx) > 100
@@ -64,29 +64,20 @@ export default function MainScreen() {
   return (
     <View style={[styles.container]}>
       {items
-        .map(
-          (
-            { itemName, itemImage, itemPrice, itemCondition, itemLocation },
-            index
-          ) => {
-            const isFirst = index === 0
-            const dragHandlers = isFirst ? panResponder.panHandlers : {}
-            return (
-              <CardSwiper
-                key={itemName}
-                itemName={itemName}
-                itemImage={itemImage}
-                itemPrice={itemPrice}
-                itemCondition={itemCondition}
-                itemLocation={itemLocation}
-                isFirst={isFirst}
-                swipe={swipe}
-                tiltSign={tiltSign}
-                {...dragHandlers}
-              />
-            )
-          }
-        )
+        .map((item, index) => {
+          const isFirst = index === 0
+          const dragHandlers = isFirst ? panResponder.panHandlers : {}
+          return (
+            <CardSwiper
+              key={item.itemName}
+              item={item}
+              isFirst={isFirst}
+              swipe={swipe}
+              tiltSign={tiltSign}
+              {...dragHandlers}
+            />
+          )
+        })
         .reverse()}
     </View>
   )
@@ -97,11 +88,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  greyScreen: {
-    backgroundColor: 'grey',
-  },
-  normalScreen: {
-    backgroundColor: 'white',
   },
 })

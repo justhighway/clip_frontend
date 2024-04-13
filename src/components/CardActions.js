@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import React from 'react'
 
 const COLORS = {
   LIKE: '#00C29B',
   DISLIKE: '#FF0071',
+  PASS: '#0089FF',
 }
 
 export default function CardActions({ type }) {
