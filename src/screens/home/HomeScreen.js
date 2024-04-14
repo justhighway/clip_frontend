@@ -1,122 +1,122 @@
-// frontend/src/screens/HomeScreen.js
-import React, { useEffect, useState } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
-import * as SecureStore from 'expo-secure-store'
-import { signOut } from '../../libs/auth' // auth.js 파일 경로에 맞게 수정
-import { useNavigation } from '@react-navigation/native'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import {
+  Animated,
+  PanResponder,
+  StyleSheet,
+  View,
+  Dimensions,
+} from 'react-native'
+import CardSwiper from '../../components/CardSwiper'
+import { items as itemsArray } from '../../libs/data'
+import { useUserContext } from '../../../contexts/UserContext'
+
+const { height } = Dimensions.get('screen')
 
 export default function HomeScreen() {
-  const [accessToken, setAccessToken] = useState('')
-  const [uid, setUid] = useState('')
-  const [isLoading, setIsLoading] = useState(true) // 새로고침 상태를 나타내는 상태 추가
-  const navigation = useNavigation()
+  const [items, setItems] = useState(itemsArray)
+  const { setUser } = useUserContext()
+  // const { uid } = params || {}
+
+  const swipe = useRef(new Animated.ValueXY()).current
+  const tiltSign = useRef(new Animated.Value(1)).current
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, { dx, dy, y0 }) => {
+      swipe.setValue({ x: dx, y: dy })
+      tiltSign.setValue(y0 > (height * 0.9) / 2 ? 1 : -1)
+    },
+
+    onPanResponderRelease: (_, { dx, dy }) => {
+      const directionX = Math.sign(dx)
+      const directionY = Math.sign(dy)
+      const isActionActiveX = Math.abs(dx) > 100
+      const isActionActiveY = Math.abs(dy) > 100
+
+      if (isActionActiveX) {
+        horizontalAction(directionX, dy)
+      } else if (isActionActiveY) {
+        verticalAction(directionY, dx)
+      } else {
+        resetPosition()
+      }
+    },
+  })
+
+  const horizontalAction = useCallback(
+    (direction, dy) => {
+      Animated.timing(swipe, {
+        toValue: {
+          x: direction * 500,
+          y: dy,
+        },
+        duration: 300,
+        useNativeDriver: true,
+      }).start(removeTopCard)
+    },
+    [swipe]
+  )
+
+  const verticalAction = useCallback(
+    (direction, dx) => {
+      Animated.timing(swipe, {
+        toValue: {
+          x: dx,
+          y: direction * 1000,
+        },
+        duration: 300,
+        useNativeDriver: true,
+      }).start(removeTopCard)
+    },
+    [swipe]
+  )
+
+  const resetPosition = useCallback(() => {
+    Animated.spring(swipe, {
+      toValue: {
+        x: 0,
+        y: 0,
+      },
+      useNativeDriver: true,
+      friction: 5,
+    }).start()
+  }, [swipe])
+
+  const removeTopCard = useCallback(() => {
+    setItems(prevItems => prevItems.slice(1))
+    swipe.setValue({ x: 0, y: 0 })
+  }, [swipe])
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const storedAccessToken = await SecureStore.getItemAsync('accessToken')
-        const storedUid = await SecureStore.getItemAsync('uid')
-        console.log('storedAccessToken: ', storedAccessToken)
-        console.log('storedUid: ', storedUid)
-        if (storedAccessToken !== null && storedUid !== null) {
-          setAccessToken(storedAccessToken)
-          setUid(storedUid)
-        } else {
-          console.log('Access token or uid not found in SecureStore')
-        }
-      } catch (error) {
-        console.error('Error fetching user data from SecureStore:', error)
-      } finally {
-        setIsLoading(false) // 데이터 로딩이 완료되면 새로고침 상태를 false로 설정
-      }
+    if (!items.length) {
+      setItems(itemsArray)
     }
-
-    fetchUserData()
-  }, [])
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      // 로그아웃 후 Secure Store에서 데이터 삭제
-      await SecureStore.deleteItemAsync('accessToken')
-      await SecureStore.deleteItemAsync('uid')
-      // 데이터 삭제 후에 화면 전환
-      navigation.replace('SignIn')
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
-  }
-
-  const isKakaoLogin = false // 이 부분은 카카오 로그인 여부에 따라 조정해야 합니다.
-
-  // 새로고침 중이면 로딩 표시를 반환
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    )
-  }
+  }, [items.length])
 
   return (
-    <>
-      <View style={styles.container}>
-        <Text style={styles.text}>로그인 성공</Text>
-        <View style={styles.line} />
-      </View>
-      <View style={styles.tokenContainer}>
-        <Text style={styles.tokenText}>{accessToken}</Text>
-        <Text style={styles.accessText}>UID: </Text>
-        <Text style={styles.tokenText}>{uid}</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-          <Text style={styles.logoutText}>로그아웃</Text>
-        </TouchableOpacity>
-      </View>
-    </>
+    <View style={[styles.container]}>
+      {items
+        .map((item, index) => {
+          const isFirst = index === 0
+          const dragHandlers = isFirst ? panResponder.panHandlers : {}
+          return (
+            <CardSwiper
+              key={item.itemName}
+              item={item}
+              isFirst={isFirst}
+              swipe={swipe}
+              tiltSign={tiltSign}
+              {...dragHandlers}
+            />
+          )
+        })
+        .reverse()}
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.3,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  tokenContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#845EC2',
-  },
-  text: {
-    fontSize: 40,
-    fontWeight: 'bold',
-  },
-  accessText: {
-    fontSize: 22,
-    marginBottom: 8,
-    marginTop: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  tokenText: {
-    paddingHorizontal: 20,
-  },
-  line: {
-    backgroundColor: 'black',
-    width: '100%',
-    height: 2,
-    marginTop: 15,
-  },
-  logoutButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-  },
-  logoutText: {
-    color: 'white',
-  },
-  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

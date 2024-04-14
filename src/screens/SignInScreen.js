@@ -14,6 +14,7 @@ import SignButtons from '../components/SignButtons'
 import OAuthButtons from '../components/OAuthButtons'
 import AnimatedTitle from '../components/AnimatedTitle'
 import * as Auth from '../libs/auth'
+import { useUserContext } from '../../contexts/UserContext'
 
 const SignInScreen = ({ navigation, route }) => {
   const { isSignUp } = route.params ?? {}
@@ -24,6 +25,7 @@ const SignInScreen = ({ navigation, route }) => {
     name: '',
   })
   const [loading, setLoading] = useState(false)
+  const { setUser } = useUserContext()
 
   const createChangeTextHandler = name => value => {
     setForm(prevForm => ({ ...prevForm, [name]: value }))
@@ -36,12 +38,12 @@ const SignInScreen = ({ navigation, route }) => {
     const signUpInfo = { email, password, name }
     setLoading(true)
     try {
-      isSignUp
-        ? // ? await Auth.signUp({ email, password })
-          // navigation.replace('Welcome', { email, password })
-          Auth.signUp(signUpInfo)
-        : Auth.signIn(signInInfo)
-      navigation.replace('MainTab')
+      let user = isSignUp
+        ? (user = await Auth.signUp(signUpInfo))
+        : (user = await Auth.signIn(signInInfo))
+      console.log(user.uid) // user 객체가 정상적으로 출력되어야 합니다.
+      setUser(user.uid) // 사용자 정보를 저장하거나 필요한 작업 수행
+      navigation.navigate('MainTab', { uid: user.uid })
     } catch (error) {
       console.log('로그인 실패 ', error)
     } finally {

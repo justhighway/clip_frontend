@@ -11,10 +11,12 @@ export const signIn = async ({ email, password }) => {
     })
     // console.log('Sign In Response:', response)
     if (response.data) {
+      // console.log(response.data)
       const { accessToken, refreshToken, uid } = response.data
-      await SecureStore.setItemAsync('accessToken', accessToken)
-      await SecureStore.setItemAsync('refreshToken', refreshToken)
-      await SecureStore.setItemAsync('uid', uid)
+      // await SecureStore.setItemAsync('accessToken', accessToken)
+      // await SecureStore.setItemAsync('refreshToken', refreshToken)
+      // await SecureStore.setItemAsync('uid', uid)
+      // console.log('uid:', uid)
       return { accessToken, refreshToken, uid }
     } else {
       throw new Error('Invalid response from server')

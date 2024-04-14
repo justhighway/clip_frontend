@@ -14,8 +14,12 @@ const RootStack = () => {
       initialRouteName="SignIn"
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SignIn" component={SignInScreen} />
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      <Stack.Screen name="UploadItem" component={UploadItemScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="UploadItem"
+        component={UploadItemScreen}
+        options={{ headerShown: true }}
+      />
       <Stack.Screen name="MainTab" component={MainTab} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
     </Stack.Navigator>
