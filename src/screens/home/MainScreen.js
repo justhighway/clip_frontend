@@ -25,30 +25,59 @@ export default function MainScreen() {
     },
 
     onPanResponderRelease: (_, { dx, dy }) => {
-      const direction = Math.sign(dx)
-      const isActionActive = Math.abs(dx) > 100
+      const directionX = Math.sign(dx)
+      const directionY = Math.sign(dy)
+      const isActionActiveX = Math.abs(dx) > 100
+      const isActionActiveY = Math.abs(dy) > 100
 
-      if (isActionActive) {
-        Animated.timing(swipe, {
-          toValue: {
-            x: direction * 500,
-            y: dy,
-          },
-          duration: 300,
-          useNativeDriver: true,
-        }).start(removeTopCard)
+      if (isActionActiveX) {
+        horizontalAction(directionX, dy)
+      } else if (isActionActiveY) {
+        verticalAction(directionY, dx)
       } else {
-        Animated.spring(swipe, {
-          toValue: {
-            x: 0,
-            y: 0,
-          },
-          useNativeDriver: true,
-          friction: 5,
-        }).start()
+        resetPosition()
       }
     },
   })
+
+  const horizontalAction = useCallback(
+    (direction, dy) => {
+      Animated.timing(swipe, {
+        toValue: {
+          x: direction * 500,
+          y: dy,
+        },
+        duration: 300,
+        useNativeDriver: true,
+      }).start(removeTopCard)
+    },
+    [swipe]
+  )
+
+  const verticalAction = useCallback(
+    (direction, dx) => {
+      Animated.timing(swipe, {
+        toValue: {
+          x: dx,
+          y: direction * 1000,
+        },
+        duration: 300,
+        useNativeDriver: true,
+      }).start(removeTopCard)
+    },
+    [swipe]
+  )
+
+  const resetPosition = useCallback(() => {
+    Animated.spring(swipe, {
+      toValue: {
+        x: 0,
+        y: 0,
+      },
+      useNativeDriver: true,
+      friction: 5,
+    }).start()
+  }, [swipe])
 
   const removeTopCard = useCallback(() => {
     setItems(prevItems => prevItems.slice(1))

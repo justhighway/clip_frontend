@@ -10,30 +10,19 @@ export default function CardSwiper({
   tiltSign,
   ...rest
 }) {
-  // 비구조화 할당
-  const {
-    itemName,
-    itemPrice,
-    itemCondition,
-    itemDescription,
-    itemImage,
-    itemLocation,
-    itemUploader,
-  } = item
+  const { itemName, itemPrice, itemCondition, itemLocation, itemImage } = item
 
-  // 카드의 기울기를 결정하는 애니메이션 스타일
   const rotate = Animated.multiply(swipe.x, tiltSign).interpolate({
     inputRange: [-150, 0, 150],
     outputRange: ['8deg', '0deg', '-8deg'],
   })
 
-  // 카드의 애니메이션 스타일
   const animatedCardStyle = {
     transform: [...swipe.getTranslateTransform(), { rotate }],
   }
 
   const likeOpacity = swipe.x.interpolate({
-    inputRange: [25, 100],
+    inputRange: [50, 100],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   })
@@ -45,14 +34,11 @@ export default function CardSwiper({
   })
 
   const passOpacity = swipe.y.interpolate({
-    inputRange: [-100, 0, 100],
+    inputRange: [-200, 0, 200],
     outputRange: [1, 0, 1],
     extrapolate: 'clamp',
   })
 
-  // 카드의 선택 영역 렌더링
-  // Fragement를 사용하여 여러 개의 자식 요소를 렌더링
-  // Animated.View를 사용하여 선택 영역을 드래그할 때 opacity를 조절
   const renderChoices = useCallback(() => {
     return (
       <Fragment>
@@ -95,7 +81,7 @@ export default function CardSwiper({
         <View style={styles.itemContainer}>
           <Text style={styles.itemName}>{itemName}</Text>
           <Text style={styles.itemInfo}>
-            {item.itemPrice.toLocaleString()} · {itemCondition} · {itemLocation}
+            {itemPrice.toLocaleString()} · {itemCondition} · {itemLocation}
           </Text>
         </View>
       </LinearGradient>
@@ -107,8 +93,6 @@ export default function CardSwiper({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    // width: width * 0.85,
-    // height: height * 0.7,
     width: '90%',
     height: '70%',
     borderRadius: 20,
@@ -125,7 +109,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 20,
-    backgroundColor: 'red',
   },
   gradient: {
     position: 'absolute',
