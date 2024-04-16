@@ -22,22 +22,42 @@ export default function CardSwiper({
   }
 
   const likeOpacity = swipe.x.interpolate({
-    inputRange: [50, 100],
+    inputRange: [50, 150],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   })
 
   const dislikeOpacity = swipe.x.interpolate({
-    inputRange: [-100, -25],
+    inputRange: [-150, -50],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   })
 
-  const passOpacity = swipe.y.interpolate({
-    inputRange: [-200, 0, 200],
-    outputRange: [1, 0, 1],
-    extrapolate: 'clamp',
-  })
+  const passOpacity = Animated.add(
+    swipe.y.interpolate({
+      inputRange: [-200, 0, 200],
+      outputRange: [1, 0, 1],
+      extrapolate: 'clamp',
+    }),
+    Animated.add(
+      Animated.multiply(
+        swipe.x.interpolate({
+          inputRange: [-150, 0, 150],
+          outputRange: [0, 0, 0],
+          extrapolate: 'clamp',
+        }),
+        0.5
+      ),
+      Animated.multiply(
+        swipe.x.interpolate({
+          inputRange: [-150, 0, 150],
+          outputRange: [0, 0, 0],
+          extrapolate: 'clamp',
+        }),
+        -0.5
+      )
+    )
+  )
 
   const renderChoices = useCallback(() => {
     return (

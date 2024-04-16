@@ -1,7 +1,6 @@
 // frontend/src/libs/auth.js
 import axios from 'axios'
 import * as SecureStore from 'expo-secure-store'
-import { useNavigation } from '@react-navigation/native'
 
 export const signIn = async ({ email, password }) => {
   try {
@@ -9,14 +8,12 @@ export const signIn = async ({ email, password }) => {
       userEmail: email,
       userPassword: password,
     })
-    // console.log('Sign In Response:', response)
     if (response.data) {
-      // console.log(response.data)
       const { accessToken, refreshToken, uid } = response.data
+      // SecureStore로 토큰 및 uid 저장
       // await SecureStore.setItemAsync('accessToken', accessToken)
       // await SecureStore.setItemAsync('refreshToken', refreshToken)
       // await SecureStore.setItemAsync('uid', uid)
-      // console.log('uid:', uid)
       return { accessToken, refreshToken, uid }
     } else {
       throw new Error('Invalid response from server')
@@ -37,9 +34,8 @@ export const signUp = async ({ email, password, name }) => {
       userPassword: password,
       userName: name,
     })
-    console.log('Sign Up Response:', response)
     if (response.data) {
-      await signIn({ email, password }) // 수정된 부분
+      console.log('로그인 성공: ', response.data)
     } else {
       throw new Error('Invalid response from server')
     }

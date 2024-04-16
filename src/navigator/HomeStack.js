@@ -3,7 +3,7 @@ import React from 'react'
 import { StyleSheet, View, Button } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-import HomeScreen from '../screens/home/HomeScreen'
+import HomeScreen from '../screens/home/HomeScreenTesting2'
 import ChatScreen from '../screens/chat/ChatScreen'
 import UploadItemScreen from '../screens/UploadItemScreen'
 

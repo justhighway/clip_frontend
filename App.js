@@ -3,6 +3,7 @@ import RootStack from './src/navigator/RootStack'
 import { NavigationContainer } from '@react-navigation/native'
 
 import UserContextProvider from './contexts/UserContext'
+import HomeScreenTesting2 from './src/screens/home/HomeScreenTesting2'
 
 export default function App() {
   return (
@@ -11,5 +12,6 @@ export default function App() {
         <RootStack />
       </NavigationContainer>
     </UserContextProvider>
+    // <HomeScreenTesting2 />
   )
 }

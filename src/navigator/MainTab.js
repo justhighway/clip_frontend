@@ -1,6 +1,6 @@
 // screens/MainTabs.js
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, SafeAreaView } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -18,6 +18,7 @@ export default function MainTab() {
 
   const handleUploadItemPress = () => {
     navigation.navigate('UploadItem', { refreshHome: true })
+    console.log('회전')
   }
 
   return (
@@ -43,7 +44,7 @@ export default function MainTab() {
               return (
                 <MaterialCommunityIcons
                   name={iconName}
-                  size={24}
+                  size={30}
                   color={color}
                   style={[
                     route.name === 'CommunityStack'

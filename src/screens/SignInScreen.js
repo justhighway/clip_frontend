@@ -41,9 +41,14 @@ const SignInScreen = ({ navigation, route }) => {
       let user = isSignUp
         ? (user = await Auth.signUp(signUpInfo))
         : (user = await Auth.signIn(signInInfo))
-      console.log(user.uid) // user 객체가 정상적으로 출력되어야 합니다.
-      setUser(user.uid) // 사용자 정보를 저장하거나 필요한 작업 수행
-      navigation.navigate('MainTab', { uid: user.uid })
+      // console.log('SignInScreen/로그인 후 user 데이터: ', user)
+      await setUser(user) // 사용자 정보를 저장하거나 필요한 작업 수행
+      await SecureStore.setItemAsync('uid', user.uid)
+      await SecureStore.setItemAsync('accessToken', user.accessToken)
+      await SecureStore.setItemAsync('refreshToken', user.refreshToken)
+
+      // console.log('//SignInScreen: user.uid:', user.uid)
+      // navigation.replace('MainTab')
     } catch (error) {
       console.log('로그인 실패 ', error)
     } finally {

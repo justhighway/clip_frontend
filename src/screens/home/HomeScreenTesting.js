@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, Button, SafeAreaView } from 'react-native'
 import { useUserContext } from '../../../contexts/UserContext'
-import { fetchUserUploadedItem } from '../../lib/items'
+import { getUserUploadedItems } from '../../libs/items'
 import { useIsFocused } from '@react-navigation/native'
-import SelectItemButton from '../../components/SelectItemButton'
+// import SelectItemButton from '../../components/SelectItemButton'
 
-const HomeScreen = () => {
+const HomeScreenTesting = () => {
   const { user } = useUserContext()
   const isFocused = useIsFocused()
   const [hasUploadedItem, setHasUploadedItem] = useState(false)
@@ -14,7 +14,7 @@ const HomeScreen = () => {
   const [selectedItem, setSelectedItem] = useState(null) // 추가
 
   const checkUploadedItem = async () => {
-    const userItems = await fetchUserUploadedItem(user.uid)
+    const userItems = await getUserUploadedItems(user.uid)
     if (userItems && userItems.length > 0) {
       console.log('HomeScreen: 업로드 된 아이템 있음!')
       setHasUploadedItem(true)
@@ -26,10 +26,8 @@ const HomeScreen = () => {
   }
 
   useEffect(() => {
-    if (user && user.uid && isFocused) {
-      checkUploadedItem()
-      console.log('HomeScreen 재포커스')
-    }
+    checkUploadedItem()
+    console.log('HomeScreen 재포커스')
   }, [user, isFocused])
 
   const handleSelectItem = selectedItem => {
@@ -60,7 +58,10 @@ const HomeScreen = () => {
           <Text style={styles.uploadText}>물건을 업로드 해주세요.</Text>
           <Button
             title="uid 확인"
-            onPress={() => console.log('로그인 된 uid:', user.uid)}
+            onPress={() => {
+              console.log('로그인 된 uid:', user.uid)
+              console.log('HomeScreen: user.uid:', user.uid)
+            }}
           />
         </View>
       )}
@@ -89,4 +90,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default HomeScreen
+export default HomeScreenTesting
